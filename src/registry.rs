@@ -55,10 +55,22 @@ impl<K: Id, V> Registry<K, V> {
         self.entries.get(id.to_index()).map(|(_, v)| v).unwrap()
     }
 
+    pub fn get_name(&self, id: K) -> Option<&Name> {
+        self.entries
+            .get(id.to_index())
+            .and_then(|(n, _)| n.as_ref())
+    }
+
     pub fn iter(&self) -> impl Iterator<Item = (K, Option<&Name>, &V)> {
         self.entries
             .iter()
             .enumerate()
             .map(|(i, (n, v))| (Id::from_index(i), n.as_ref(), v))
+    }
+}
+
+impl<K: Id, V> Default for Registry<K, V> {
+    fn default() -> Self {
+        Self::new()
     }
 }
