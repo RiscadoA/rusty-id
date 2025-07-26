@@ -1,5 +1,6 @@
 use std::hash::{Hash, Hasher};
 
+#[derive(Clone)]
 pub struct Name {
     separator: usize,
     name: String,
@@ -89,12 +90,3 @@ impl std::cmp::PartialEq for Name {
 }
 
 impl std::cmp::Eq for Name {}
-
-impl Clone for Name {
-    fn clone(&self) -> Self {
-        Self {
-            separator: self.separator,
-            name: self.name.clone(),
-        }
-    }
-}

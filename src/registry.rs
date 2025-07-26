@@ -74,3 +74,12 @@ impl<K: Id, V> Default for Registry<K, V> {
         Self::new()
     }
 }
+
+impl<K: Id, V: Clone> Clone for Registry<K, V> {
+    fn clone(&self) -> Self {
+        Self {
+            name_to_id: self.name_to_id.clone(),
+            entries: self.entries.clone(),
+        }
+    }
+}
