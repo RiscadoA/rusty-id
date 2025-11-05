@@ -1,7 +1,11 @@
 use std::collections::HashMap;
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 use crate::{Id, Name};
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Registry<K: Id, V> {
     name_to_id: HashMap<Name, K>,
     entries: Vec<(Option<Name>, V)>,
