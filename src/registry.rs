@@ -19,6 +19,20 @@ impl<K: Id, V> Registry<K, V> {
         }
     }
 
+    pub fn from_entries(entries: Vec<(Option<Name>, V)>) -> Self {
+        let mut name_to_id = HashMap::new();
+        for (index, (name_opt, _)) in entries.iter().enumerate() {
+            if let Some(name) = name_opt {
+                name_to_id.insert(name.clone(), Id::from_index(index));
+            }
+        }
+
+        Self {
+            name_to_id,
+            entries,
+        }
+    }
+
     pub fn contains(&self, name: &Name) -> bool {
         self.name_to_id.contains_key(name)
     }
@@ -70,6 +84,10 @@ impl<K: Id, V> Registry<K, V> {
             .iter()
             .enumerate()
             .map(|(i, (n, v))| (Id::from_index(i), n.as_ref(), v))
+    }
+
+    pub fn entries(&self) -> &Vec<(Option<Name>, V)> {
+        &self.entries
     }
 }
 
