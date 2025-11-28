@@ -3,8 +3,12 @@ use std::hash::{Hash, Hasher};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "bevy_reflect")]
+use bevy_reflect::Reflect;
+
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(Reflect))]
 pub struct Name {
     separator: usize,
     name: String,

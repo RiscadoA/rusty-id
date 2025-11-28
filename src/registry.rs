@@ -3,9 +3,13 @@ use std::collections::HashMap;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "bevy_reflect")]
+use bevy_reflect::Reflect;
+
 use crate::{Id, Name};
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "bevy_reflect", derive(Reflect))]
 pub struct Registry<K: Id, V> {
     name_to_id: HashMap<Name, K>,
     entries: Vec<(Option<Name>, V)>,
