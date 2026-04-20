@@ -15,6 +15,8 @@ pub struct Registry<K: Id, V> {
     entries: Vec<(Option<Name>, V)>,
 }
 
+pub struct PartialRegistry<K: Id>(Registry<K, ()>);
+
 impl<K: Id, V> Registry<K, V> {
     pub fn new() -> Self {
         Self {
@@ -93,6 +95,73 @@ impl<K: Id, V> Registry<K, V> {
     pub fn entries(&self) -> &Vec<(Option<Name>, V)> {
         &self.entries
     }
+
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
+}
+
+impl<K: Id> PartialRegistry<K> {
+    pub fn new() -> Self {
+        Self(Registry::new())
+    }
+
+    pub fn contains(&self, name: &Name) -> bool {
+        self.0.contains(name)
+    }
+
+    pub fn find(&self, name: &Name) -> Option<K> {
+        self.0.find(name)
+    }
+
+    pub fn get_name(&self, id: K) -> Option<&Name> {
+        self.0.get_name(id)
+    }
+
+    pub fn add_named(&mut self, name: Name) -> Result<K, Name> {
+        self.0.add_named(name, ())
+    }
+
+    pub fn add_anonymous(&mut self) -> K {
+        self.0.add_anonymous(())
+    }
+
+    pub fn build<V>(self, mut func: impl FnMut(K) -> V) -> Registry<K, V> {
+        Registry::from_entries(
+            self.0
+                .entries
+                .into_iter()
+                .enumerate()
+                .map(move |(i, (n, _))| (n, func(Id::from_index(i))))
+                .collect(),
+        )
+    }
+
+    pub fn try_build<V, E>(
+        self,
+        mut func: impl FnMut(K) -> Result<V, E>,
+    ) -> Result<Registry<K, V>, E> {
+        Ok(Registry::from_entries(
+            self.0
+                .entries
+                .into_iter()
+                .enumerate()
+                .map(move |(i, (n, _))| func(Id::from_index(i)).map(|e| (n, e)))
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = (K, Option<&Name>)> {
+        self.0
+            .entries
+            .iter()
+            .enumerate()
+            .map(|(i, (n, _))| (Id::from_index(i), n.as_ref()))
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
 }
 
 impl<K: Id, V> Default for Registry<K, V> {
@@ -107,5 +176,17 @@ impl<K: Id, V: Clone> Clone for Registry<K, V> {
             name_to_id: self.name_to_id.clone(),
             entries: self.entries.clone(),
         }
+    }
+}
+
+impl<K: Id> Default for PartialRegistry<K> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<K: Id> Clone for PartialRegistry<K> {
+    fn clone(&self) -> Self {
+        Self(self.0.clone())
     }
 }
