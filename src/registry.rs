@@ -57,6 +57,24 @@ impl<K: Id, V> Registry<K, V> {
         Ok(id)
     }
 
+    pub fn try_add_named_with<E>(
+        &mut self,
+        name: Name,
+        func: impl FnOnce(K) -> Result<V, E>,
+    ) -> Result<Result<K, E>, Name> {
+        if self.name_to_id.contains_key(&name) {
+            return Err(name);
+        }
+
+        match self.try_add_with(Some(name.clone()), func) {
+            Ok(id) => {
+                self.name_to_id.insert(name, id);
+                Ok(Ok(id))
+            }
+            Err(e) => Ok(Err(e)),
+        }
+    }
+
     pub fn add_anonymous(&mut self, entry: V) -> K {
         self.add_anonymous_with(|_| entry)
     }
@@ -65,10 +83,28 @@ impl<K: Id, V> Registry<K, V> {
         self.add_with(None, func)
     }
 
+    pub fn try_add_anonymous_with<E>(
+        &mut self,
+        func: impl FnOnce(K) -> Result<V, E>,
+    ) -> Result<K, E> {
+        self.try_add_with(None, func)
+    }
+
     fn add_with(&mut self, name: Option<Name>, func: impl FnOnce(K) -> V) -> K {
         let id = Id::from_index(self.entries.len());
         self.entries.push((name, func(id)));
         id
+    }
+
+    fn try_add_with<E>(
+        &mut self,
+        name: Option<Name>,
+        func: impl FnOnce(K) -> Result<V, E>,
+    ) -> Result<K, E> {
+        let id = Id::from_index(self.entries.len());
+        let entry = func(id)?;
+        self.entries.push((name, entry));
+        Ok(id)
     }
 
     pub fn find(&self, name: &Name) -> Option<K> {
@@ -98,6 +134,10 @@ impl<K: Id, V> Registry<K, V> {
 
     pub fn len(&self) -> usize {
         self.entries.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }
 
@@ -161,6 +201,10 @@ impl<K: Id> PartialRegistry<K> {
 
     pub fn len(&self) -> usize {
         self.0.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }
 
