@@ -395,7 +395,24 @@ name = "rusty-id"
 version = "0.9.0"
 dependencies = [
  "bevy_reflect",
+ "rusty-reflect",
  "serde",
+]
+
+[[package]]
+name = "rusty-reflect"
+version = "0.2.0"
+dependencies = [
+ "rusty-reflect-macros",
+]
+
+[[package]]
+name = "rusty-reflect-macros"
+version = "0.2.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

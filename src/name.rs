@@ -6,9 +6,13 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "bevy_reflect")]
 use bevy_reflect::Reflect;
 
+#[cfg(feature = "rusty_reflect")]
+use rusty_reflect::Reflectable;
+
 #[derive(Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "bevy_reflect", derive(Reflect))]
+#[cfg_attr(feature = "rusty_reflect", derive(Reflectable))]
 pub struct Name {
     separator: usize,
     name: String,

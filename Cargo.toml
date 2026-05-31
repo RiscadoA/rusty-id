@@ -6,8 +6,10 @@ edition = "2024"
 [dependencies]
 serde = { version = "1.0", features = ["derive"], optional = true }
 bevy_reflect = { version = "0.17", optional = true }
+rusty-reflect = { path = "../rusty-reflect", optional = true }
 
 [features]
 default = []
 serde = ["dep:serde"]
 bevy_reflect = ["dep:bevy_reflect"]
+rusty_reflect = ["dep:rusty-reflect"]
